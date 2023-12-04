@@ -6,7 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.moviebuffsapp.network.MovieApi
-import com.example.moviebuffsapp.network.MovieInfo
+import com.example.moviebuffsapp.network.Movies
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -14,13 +14,13 @@ import kotlinx.coroutines.launch
 import java.io.IOException
 
 sealed interface MovieUiState {
-    data class Success(val movies: List<MovieInfo>) : MovieUiState
+    data class Success(val movies: List<Movies>) : MovieUiState
     object Error : MovieUiState
     object Loading : MovieUiState
 }
 
 data class UiState(
-    val currentMovie: MovieInfo?,
+    val currentMovie: Movies?,
     val isShowingListPage: Boolean = true,
 )
 
@@ -46,7 +46,7 @@ class MovieViewModel : ViewModel() {
         getMovies()
     }
 
-    fun updateCurrentMovie(selectedMovie: MovieInfo) {
+    fun updateCurrentMovie(selectedMovie: Movies) {
         _uiState.update {
             it.copy(currentMovie = selectedMovie)
         }
@@ -63,6 +63,7 @@ class MovieViewModel : ViewModel() {
             it.copy(isShowingListPage = false)
         }
     }
+
 
     /**
      * Gets Movies information from the Movie API Retrofit service and updates

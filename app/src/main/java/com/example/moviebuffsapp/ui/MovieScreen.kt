@@ -60,11 +60,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.moviebuffsapp.R
-import com.example.moviebuffsapp.network.MovieInfo
+import com.example.moviebuffsapp.network.Movies
 import com.example.moviebuffsapp.ui.theme.MovieBuffsAppTheme
 import com.example.moviebuffsapp.ui.utils.MoviesContentType
 
@@ -99,7 +100,7 @@ fun MovieBuffsApp(
         topBar = {
             MovieBuffsAppBar(
                 isShowingListPage = uiState.isShowingListPage,
-                onBackButtonClick = { MovieViewModel.navigateToListPage() },
+                onBackButtonClick = { ViewModel.navigateToListPage() },
             )
         }
     ) { innerPadding ->
@@ -207,7 +208,7 @@ fun MovieBuffsAppBar(
     }
 
     @Composable
-    fun MovieList(movies: List<MovieInfo>, modifier: Modifier = Modifier) {
+    fun MovieList(movies: List<Movies>, modifier: Modifier = Modifier) {
         LazyColumn(
             modifier = modifier
                 .padding(4.dp)
@@ -223,7 +224,7 @@ fun MovieBuffsAppBar(
     }
 
     @Composable
-    fun MovieCard(movie: MovieInfo, modifier: Modifier = Modifier) {
+    fun MovieCard(movie: Movies, modifier: Modifier = Modifier) {
         Card(
             modifier = modifier
                 .padding(top = 8.dp)
@@ -294,9 +295,9 @@ fun MovieBuffsAppBar(
 
     @Composable
     fun MoviesListAndDetails(
-        movies: List<MovieInfo>,
-        onClick: (MovieInfo) -> Unit,
-        selectedMovie: MovieInfo,
+        movies: List<Movies>,
+        onClick: (Movies) -> Unit,
+        selectedMovie: Movies,
         contentPadding: PaddingValues,
         modifier: Modifier = Modifier
     ) {
@@ -324,8 +325,8 @@ fun MovieBuffsAppBar(
 
     @Composable
     fun MovieDetails(
-        movie: MovieInfo,
-        selectedMovie: MovieInfo,
+        movie: Movies,
+        selectedMovie: Movies,
         onBackPressed: () -> Unit,
         contentPadding: PaddingValues,
         modifier: Modifier = Modifier
@@ -431,7 +432,7 @@ fun MovieBuffsAppBar(
     @Preview
     @Composable
     fun MovieDetailsPreview() {
-        val movie = MovieInfo(
+        val movie = Movies(
             title = "Inception",
             poster = "https://example.com/poster_inception.jpg",
             description = "A mind-bending movie about dreams and reality.",
@@ -455,7 +456,7 @@ fun MovieBuffsAppBar(
     @Preview
     @Composable
     fun MovieCardPreview() {
-        val movie = MovieInfo(
+        val movie = Movies(
             title = "Inception",
             poster = "https://example.com/poster_inception.jpg",
             description = "A mind-bending movie about dreams and reality.",
@@ -475,7 +476,7 @@ fun MovieBuffsAppBar(
     @Composable
     fun MovieListPreview() {
         val movies = List(3) {
-            MovieInfo(
+            Movies(
                 title = "Movie Title $it",
                 poster = "https://example.com/poster_$it.jpg",
                 description = "Description for Movie $it",

@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class MovieInfo(
+data class Movies(
     val title: String,
     val poster: String,
     val description: String,
