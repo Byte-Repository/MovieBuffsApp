@@ -71,6 +71,8 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
     // Coil
     implementation("io.coil-kt:coil-compose:2.4.0")
+    //window-size-class
+    implementation("androidx.compose.material3:material3-window-size-class")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

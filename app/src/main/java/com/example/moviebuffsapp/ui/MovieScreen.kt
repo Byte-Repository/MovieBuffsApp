@@ -19,6 +19,7 @@ package com.example.moviebuffsapp.ui
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -32,25 +33,32 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.moviebuffsapp.R
@@ -59,87 +67,112 @@ import com.example.moviebuffsapp.ui.theme.MovieBuffsAppTheme
 
 @Composable
 fun MovieBuffsApp(
-    movieUiState: MovieUiState, modifier: Modifier = Modifier
+    movieUiState: MovieUiState,
+    modifier: Modifier = Modifier
 ) {
     when (movieUiState) {
         is MovieUiState.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())
         is MovieUiState.Success -> MovieList(movieUiState.movies, modifier)
         is MovieUiState.Error -> ErrorScreen(modifier = modifier.fillMaxSize())
     }
-}
 
-//    Scaffold(
-//        topBar = {
-//            MovieBuffsAppBar(
-//                isShowingListPage = uiState.isShowingListPage,
-//                onBackButtonClick = { viewModel.navigateToListPage() },
-//            )
-//        }
-//) { innerPadding ->
-//    // TODO: Add simple navigation with if/else conditional to show Details page
-//    if (uiState.isShowingListPage) {
-//        MovieList(
-//            movies = uiState.movieList,
-//            onClick = {
-//                viewModel.updateCurrentMovie(it)
-//                viewModel.navigateToDetailPage()
-//            },
-//            contentPadding = innerPadding,
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(
-//                    top = dimensionResource(R.dimen.padding_medium),
-//                    start = dimensionResource(R.dimen.padding_medium),
-//                    end = dimensionResource(R.dimen.padding_medium),
-//                )
-//            )
-//        } else {
-//            MovieDetails(
-//                selectedMovie = uiState.currentMovie,
-//                contentPadding = innerPadding,
-//                onBackPressed = {
-//                    viewModel.navigateToListPage()
-//                }
-//            )
-//        }
-//    }
-//}
-//
-//@Composable
-//private fun MovieDetails(
-//    selectedMovie: Movie,
-//    onBackPressed: () -> Unit,
-//    contentPadding: PaddingValues,
-//    modifier: Modifier = Modifier
-//) {
-//    // TODO: Add BackHandler
-//    BackHandler {
-//        onBackPressed()
-//    }
-
-    @Composable
-    fun LoadingScreen(modifier: Modifier = Modifier) {
-        Image(
-            modifier = modifier.size(200.dp),
-            painter = painterResource(R.drawable.loading_img),
-            contentDescription = stringResource(R.string.loading)
-        )
-    }
-
-    @Composable
-    fun ErrorScreen(modifier: Modifier = Modifier) {
-        Column(
-            modifier = modifier,
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_connection_error),
-                contentDescription = ""
+    Scaffold(
+        topBar = {
+            MovieBuffsAppBar(
+                isShowingListPage = uiState.isShowingListPage,
+                onBackButtonClick = { MovieViewModel.navigateToListPage() },
             )
-            Text(text = stringResource(R.string.loading_failed), modifier = Modifier.padding(16.dp))
+        }
+) { innerPadding ->
+    // TODO: Add simple navigation with if/else conditional to show Details page
+    if (uiState.isShowingListPage) {
+        MovieList(
+            movies = uiState.movieList,
+            onClick = {
+                MovieViewModel.updateCurrentMovie(it)
+                MovieViewModel.navigateToDetailPage()
+            },
+            contentPadding = innerPadding,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    top = dimensionResource(R.dimen.padding_medium),
+                    start = dimensionResource(R.dimen.padding_medium),
+                    end = dimensionResource(R.dimen.padding_medium),
+                )
+            )
+        } else {
+            MovieDetails(
+                selectedMovie = uiState.currentMovie,
+                contentPadding = innerPadding,
+                onBackPressed = {
+                    viewModel.navigateToListPage()
+                }
+            )
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MovieBuffsAppBar(
+    onBackButtonClick: () -> Unit,
+    isShowingListPage: Boolean,
+    modifier: Modifier = Modifier
+) {
+    TopAppBar(
+        title = {
+            Text(
+                text =
+                if (!isShowingListPage) {
+                    stringResource(R.string.detail_fragment_label)
+                } else {
+                    stringResource(R.string.list_fragment_label)
+                }
+            )
+        },
+        navigationIcon = if (!isShowingListPage) {
+            {
+                IconButton(onClick = onBackButtonClick) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.back_button)
+                    )
+                }
+            }
+        } else {
+            { Box {} }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primary
+        ),
+        modifier = modifier,
+    )
+}
+
+@Composable
+fun LoadingScreen(modifier: Modifier = Modifier) {
+    Image(
+        modifier = modifier.size(200.dp),
+        painter = painterResource(R.drawable.loading_img),
+        contentDescription = stringResource(R.string.loading)
+    )
+}
+
+@Composable
+fun ErrorScreen(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.ic_connection_error),
+            contentDescription = ""
+        )
+        Text(text = stringResource(R.string.loading_failed), modifier = Modifier.padding(16.dp))
+    }
+}
 
 @Composable
 fun MovieList(movies: List<MovieInfo>, modifier: Modifier = Modifier) {
@@ -215,7 +248,7 @@ fun MovieCard(movie: MovieInfo, modifier: Modifier = Modifier) {
                         imageVector = Icons.Default.Star,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.secondary,
-                        modifier = Modifier.padding(end =2.dp)
+                        modifier = Modifier.padding(end = 2.dp)
                     )
                     Text(
                         text = movie.reviewScore,
@@ -235,6 +268,7 @@ fun MovieDetails(
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
+    // TODO: Add BackHandler
     BackHandler {
         onBackPressed()
     }
@@ -305,7 +339,7 @@ fun MovieDetails(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    imageVector = Icons.Default.Star,
+                    imageVector = Icons.Filled.Star,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.padding(end = 2.dp)
@@ -344,8 +378,12 @@ fun MovieDetailsPreview() {
         length = "148 min"
     )
 
-    MovieBuffsAppTheme(){
-        MovieDetails(movie = movie)
+    MovieBuffsAppTheme() {
+        MovieDetails(movie = movie,
+            selectedMovie = movie,
+            onBackPressed = {},
+            contentPadding = PaddingValues()
+        )
     }
 }
 

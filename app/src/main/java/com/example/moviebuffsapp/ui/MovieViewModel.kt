@@ -7,6 +7,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.moviebuffsapp.network.MovieApi
 import com.example.moviebuffsapp.network.MovieInfo
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.IOException
 
@@ -16,16 +19,49 @@ sealed interface MovieUiState {
     object Loading : MovieUiState
 }
 
+data class UiState(
+    val currentMovie: MovieInfo?,
+    val isShowingListPage: Boolean = true,
+)
+
 class MovieViewModel : ViewModel() {
-    /** The mutable State that stores the status of the most recent request */
+    // The mutable State that stores the status of the most recent request
     var movieUiState: MovieUiState by mutableStateOf(MovieUiState.Loading)
         private set
+
+    // New mutable State for navigation
+    private val _uiState = MutableStateFlow(
+        UiState(
+            currentMovie = null,
+            isShowingListPage = true
+        )
+    )
+
+    val uiState: StateFlow<UiState> = _uiState
 
     /**
      * Call getMovies() on init so we can display status immediately.
      */
     init {
         getMovies()
+    }
+
+    fun updateCurrentMovie(selectedMovie: MovieInfo) {
+        _uiState.update {
+            it.copy(currentMovie = selectedMovie)
+        }
+    }
+
+    fun navigateToListPage() {
+        _uiState.update {
+            it.copy(isShowingListPage = true)
+        }
+    }
+
+    fun navigateToDetailPage() {
+        _uiState.update {
+            it.copy(isShowingListPage = false)
+        }
     }
 
     /**
