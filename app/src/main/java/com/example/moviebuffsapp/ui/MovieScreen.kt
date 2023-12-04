@@ -476,7 +476,7 @@ fun MovieCardPreview() {
     )
 
     MovieBuffsAppTheme() {
-        MovieCard(movie = movie)
+        MovieCard(movie = movie, onClick = {}) // Provide a placeholder onClick lambda
     }
 }
 
@@ -497,7 +497,8 @@ fun MovieListPreview() {
     }
 
     MovieBuffsAppTheme() {
-        MovieList(movies = movies)
+        MovieList(movies = movies, onClick = {}) // Provide a placeholder onClick lambda
     }
 }
+
 
