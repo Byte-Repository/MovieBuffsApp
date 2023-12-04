@@ -6,12 +6,12 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.moviebuffsapp.network.MovieApi
-import com.example.moviebuffsapp.network.MoviePhoto
+import com.example.moviebuffsapp.network.MovieInfo
 import kotlinx.coroutines.launch
 import java.io.IOException
 
 sealed interface MovieUiState {
-    data class Success(val photos: List<MoviePhoto>) : MovieUiState
+    data class Success(val movies: List<MovieInfo>) : MovieUiState
     object Error : MovieUiState
     object Loading : MovieUiState
 }
@@ -22,20 +22,20 @@ class MovieViewModel : ViewModel() {
         private set
 
     /**
-     * Call getMoviePhotos() on init so we can display status immediately.
+     * Call getMovies() on init so we can display status immediately.
      */
     init {
-        getMoviePhotos()
+        getMovies()
     }
 
     /**
-     * Gets Movie photos information from the Movie API Retrofit service and updates
-     * [MoviePhoto] [List] [MutableList].
+     * Gets Movies information from the Movie API Retrofit service and updates
+     * [Movie] [List] [MutableList].
      */
-    fun getMoviePhotos() {
+    fun getMovies() {
         viewModelScope.launch {
             movieUiState = try {
-                MovieUiState.Success(MovieApi.retrofitService.getPhotos())
+                MovieUiState.Success(MovieApi.retrofitService.getMovies())
             } catch (e: IOException) {
                 MovieUiState.Error
             }

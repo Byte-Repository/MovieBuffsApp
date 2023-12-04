@@ -22,6 +22,6 @@ object MovieApi {
 
 interface MovieApiService {
     @GET("MovieBuffs/movies.json")
-    suspend fun getPhotos(): List<MoviePhoto>
+    suspend fun getMovies(): List<MovieInfo>
 }
 
