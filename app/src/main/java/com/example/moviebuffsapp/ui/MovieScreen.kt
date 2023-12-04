@@ -305,35 +305,35 @@ fun MovieCard(
     }
 }
 
-@Composable
-fun MoviesListAndDetails(
-    movies: List<Movies>,
-    onClick: (Movies) -> Unit,
-    selectedMovie: Movies,
-    contentPadding: PaddingValues,
-    modifier: Modifier = Modifier
-) {
-    Row(modifier = modifier) {
-        MovieList(
-            movies = movies,
-            onClick = onClick,
-            contentPadding = contentPadding,
-            modifier = Modifier
-                .weight(2f)
-                .padding(
-                    top = dimensionResource(R.dimen.padding_medium),
-                    start = dimensionResource(R.dimen.padding_medium),
-                    end = dimensionResource(R.dimen.padding_medium)
-                )
-        )
-        MovieDetails(
-            selectedMovie = selectedMovie,
-            onBackPressed = { },
-            contentPadding = contentPadding,
-            modifier = Modifier.weight(3f)
-        )
-    }
-}
+//@Composable
+//fun MoviesListAndDetails(
+//    movies: List<Movies>,
+//    onClick: (Movies) -> Unit,
+//    selectedMovie: Movies,
+//    contentPadding: PaddingValues,
+//    modifier: Modifier = Modifier
+//) {
+//    Row(modifier = modifier) {
+//        MovieList(
+//            movies = movies,
+//            onClick = onClick,
+//            contentPadding = contentPadding,
+//            modifier = Modifier
+//                .weight(2f)
+//                .padding(
+//                    top = dimensionResource(R.dimen.padding_medium),
+//                    start = dimensionResource(R.dimen.padding_medium),
+//                    end = dimensionResource(R.dimen.padding_medium)
+//                )
+//        )
+//        MovieDetails(
+//            selectedMovie = selectedMovie,
+//            onBackPressed = { },
+//            contentPadding = contentPadding,
+//            modifier = Modifier.weight(3f)
+//        )
+//    }
+//}
 
 @Composable
 fun MovieDetails(
