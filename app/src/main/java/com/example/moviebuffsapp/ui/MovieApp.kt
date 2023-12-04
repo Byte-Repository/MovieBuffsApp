@@ -45,7 +45,6 @@ fun MovieBuffsApp() {
         Surface(
             modifier = Modifier.fillMaxSize()
         ) {
-            val movieViewModel: MovieViewModel = viewModel()
             MovieBuffsApp(
                 movieUiState = movieViewModel.movieUiState
             )

@@ -46,7 +46,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -59,21 +62,33 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.moviebuffsapp.R
 import com.example.moviebuffsapp.network.MovieInfo
 import com.example.moviebuffsapp.ui.theme.MovieBuffsAppTheme
+import com.example.moviebuffsapp.ui.utils.MoviesContentType
 
 @Composable
 fun MovieBuffsApp(
-    movieUiState: MovieUiState,
+    windowSize: WindowWidthSizeClass,
     modifier: Modifier = Modifier
 ) {
-    when (movieUiState) {
-        is MovieUiState.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())
-        is MovieUiState.Success -> MovieList(movieUiState.movies, modifier)
-        is MovieUiState.Error -> ErrorScreen(modifier = modifier.fillMaxSize())
+    val contentType: MoviesContentType
+    when (windowSize) {
+        WindowWidthSizeClass.Compact -> {
+            contentType = MoviesContentType.LIST_ONLY
+        }
+        WindowWidthSizeClass.Medium -> {
+            contentType = MoviesContentType.LIST_ONLY
+        }
+        WindowWidthSizeClass.Expanded -> {
+            contentType = MoviesContentType.LIST_AND_DETAIL
+        }
+        else -> {
+            contentType = MoviesContentType.LIST_ONLY
+        }
     }
 
     Scaffold(
@@ -85,12 +100,24 @@ fun MovieBuffsApp(
         }
 ) { innerPadding ->
     // TODO: Add simple navigation with if/else conditional to show Details page
-    if (uiState.isShowingListPage) {
-        MovieList(
+        if (contentType == MoviesContentType.LIST_AND_DETAIL) {
+            MoviesListAndDetails(
+                sports = uiState.moviesList,
+                onClick = {
+                    viewModel.updateCurrentMovie(it)
+                },
+                selectedMovie = uiState.currentMovie,
+                contentPadding = innerPadding,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+        } else {
+            if (uiState.isShowingListPage) {
+            MovieList(
             movies = uiState.movieList,
             onClick = {
-                MovieViewModel.updateCurrentMovie(it)
-                MovieViewModel.navigateToDetailPage()
+                viewModel.updateCurrentMovie(it)
+                viewModel.navigateToDetailPage()
             },
             contentPadding = innerPadding,
             modifier = Modifier
@@ -360,6 +387,36 @@ fun MovieDetails(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 16.dp)
+        )
+    }
+}
+
+@Composable
+fun MoviesListAndDetails(
+    movies: List<MovieInfo>,
+    onClick: (MovieInfo) -> Unit,
+    selectedMovie: MovieInfo,
+    contentPadding: PaddingValues,
+    modifier: Modifier = Modifier
+) {
+    Row(modifier = modifier) {
+        MovieList(
+            movies = movies,
+            onClick = onClick,
+            contentPadding = contentPadding,
+            modifier = Modifier
+                .weight(2f)
+                .padding(
+                    top = dimensionResource(R.dimen.padding_medium),
+                    start = dimensionResource(R.dimen.padding_medium),
+                    end = dimensionResource(R.dimen.padding_medium)
+                )
+        )
+        MovieDetails(
+            selectedMovie = selectedMovie,
+            onBackPressed = { },
+            contentPadding = contentPadding,
+            modifier = Modifier.weight(3f)
         )
     }
 }
