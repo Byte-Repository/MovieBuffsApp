@@ -147,7 +147,6 @@ fun MovieBuffsApp(
     }
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MovieBuffsAppBar(
@@ -213,9 +212,11 @@ fun ErrorScreen(modifier: Modifier = Modifier) {
 fun MovieList(
     movies: List<Movies>,
     onClick: (Movies) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
     LazyColumn(
+        contentPadding = contentPadding,
         modifier = modifier
             .padding(4.dp)
             .fillMaxWidth(),
