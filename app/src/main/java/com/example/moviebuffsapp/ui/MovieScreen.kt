@@ -183,314 +183,311 @@ fun MovieBuffsAppBar(
     )
 }
 
-    @Composable
-    fun LoadingScreen(modifier: Modifier = Modifier) {
+@Composable
+fun LoadingScreen(modifier: Modifier = Modifier) {
+    Image(
+        modifier = modifier.size(200.dp),
+        painter = painterResource(R.drawable.loading_img),
+        contentDescription = stringResource(R.string.loading)
+    )
+}
+
+@Composable
+fun ErrorScreen(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Image(
-            modifier = modifier.size(200.dp),
-            painter = painterResource(R.drawable.loading_img),
-            contentDescription = stringResource(R.string.loading)
+            painter = painterResource(id = R.drawable.ic_connection_error),
+            contentDescription = ""
         )
+        Text(text = stringResource(R.string.loading_failed), modifier = Modifier.padding(16.dp))
     }
+}
 
-    @Composable
-    fun ErrorScreen(modifier: Modifier = Modifier) {
-        Column(
-            modifier = modifier,
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_connection_error),
-                contentDescription = ""
+@Composable
+fun MovieList(movies: List<Movies>, modifier: Modifier = Modifier) {
+    LazyColumn(
+        modifier = modifier
+            .padding(4.dp)
+            .fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(2.dp), // Added verticalArrangement
+    ) {
+        items(items = movies, key = { movie -> movie.title }) { movie ->
+            MovieCard(
+                movie = movie,
             )
-            Text(text = stringResource(R.string.loading_failed), modifier = Modifier.padding(16.dp))
         }
     }
+}
 
-    @Composable
-    fun MovieList(movies: List<Movies>, modifier: Modifier = Modifier) {
-        LazyColumn(
-            modifier = modifier
-                .padding(4.dp)
+@Composable
+fun MovieCard(movie: Movies, modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier
+            .padding(top = 8.dp)
+            .height(180.dp)
+            .fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier
                 .fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(2.dp), // Added verticalArrangement
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            items(items = movies, key = { movie -> movie.title }) { movie ->
-                MovieCard(
-                    movie = movie,
-                )
-            }
-        }
-    }
-
-    @Composable
-    fun MovieCard(movie: Movies, modifier: Modifier = Modifier) {
-        Card(
-            modifier = modifier
-                .padding(top = 8.dp)
-                .height(180.dp)
-                .fillMaxWidth()
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                AsyncImage(
-                    model = ImageRequest.Builder(context = LocalContext.current)
-                        .data(movie.poster)
-                        .crossfade(true)
-                        .build(),
-                    error = painterResource(R.drawable.ic_broken_image),
-                    placeholder = painterResource(R.drawable.loading_img),
-                    contentDescription = stringResource(R.string.movie_buffs_app),
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .padding(end = 4.dp)
-                        .width(120.dp)
-                )
-
-                Column(
-                    modifier = Modifier
-                        .padding(0.dp) // Added padding for the entire Column
-                ) {
-                    Text(
-                        text = movie.title,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    Spacer(modifier = Modifier.height(4.dp)) // Spacer with height of 4.dp
-
-                    Text(
-                        text = movie.description,
-                        style = MaterialTheme.typography.titleMedium,
-                        maxLines = 4,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier
-                            .padding(end = 4.dp)
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp)) // Spacer with height of 8.dp
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Star,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.secondary,
-                            modifier = Modifier.padding(end = 2.dp)
-                        )
-                        Text(
-                            text = movie.reviewScore,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                }
-            }
-        }
-    }
-
-    @Composable
-    fun MoviesListAndDetails(
-        movies: List<Movies>,
-        onClick: (Movies) -> Unit,
-        selectedMovie: Movies,
-        contentPadding: PaddingValues,
-        modifier: Modifier = Modifier
-    ) {
-        Row(modifier = modifier) {
-            MovieList(
-                movies = movies,
-                onClick = onClick,
-                contentPadding = contentPadding,
-                modifier = Modifier
-                    .weight(2f)
-                    .padding(
-                        top = dimensionResource(R.dimen.padding_medium),
-                        start = dimensionResource(R.dimen.padding_medium),
-                        end = dimensionResource(R.dimen.padding_medium)
-                    )
-            )
-            MovieDetails(
-                selectedMovie = selectedMovie,
-                onBackPressed = { },
-                contentPadding = contentPadding,
-                modifier = Modifier.weight(3f)
-            )
-        }
-    }
-
-    @Composable
-    fun MovieDetails(
-        movie: Movies,
-        selectedMovie: Movies,
-        onBackPressed: () -> Unit,
-        contentPadding: PaddingValues,
-        modifier: Modifier = Modifier
-    ) {
-        // TODO: Add BackHandler
-        BackHandler {
-            onBackPressed()
-        }
-
-        Column(
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(top = 56.dp, start = 16.dp, end = 16.dp, bottom = 16.dp)
-        ) {
-            // Image Composable
             AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
+                model = ImageRequest.Builder(context = LocalContext.current)
                     .data(movie.poster)
                     .crossfade(true)
                     .build(),
-                contentDescription = null,
+                error = painterResource(R.drawable.ic_broken_image),
+                placeholder = painterResource(R.drawable.loading_img),
+                contentDescription = stringResource(R.string.movie_buffs_app),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(350.dp)
+                    .padding(end = 4.dp)
+                    .width(120.dp)
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Column(
+                modifier = Modifier
+                    .padding(0.dp) // Added padding for the entire Column
+            ) {
+                Text(
+                    text = movie.title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
 
-            // Details Section
-            Column(modifier = Modifier.padding(8.dp)) {
-                // Row 1
+                Spacer(modifier = Modifier.height(4.dp)) // Spacer with height of 4.dp
+
+                Text(
+                    text = movie.description,
+                    style = MaterialTheme.typography.titleMedium,
+                    maxLines = 4,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier
+                        .padding(end = 4.dp)
+                )
+
+                Spacer(modifier = Modifier.height(8.dp)) // Spacer with height of 8.dp
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.Info,
+                        imageVector = Icons.Default.Star,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.secondary,
                         modifier = Modifier.padding(end = 2.dp)
                     )
                     Text(
-                        text = "PG-13 | ${movie.length}",
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                // Row 2
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.DateRange,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.secondary,
-                        modifier = Modifier.padding(end = 2.dp)
-                    )
-                    Text(
-                        text = "${movie.releaseDate}",
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                // Row 3
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Star,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.secondary,
-                        modifier = Modifier.padding(end = 2.dp)
-                    )
-                    Text(
-                        text = "${movie.reviewScore}",
-                        style = MaterialTheme.typography.titleMedium
+                        text = movie.reviewScore,
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Movie Description Text Composable
-            Text(
-                text = movie.description,
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 16.dp)
-            )
         }
     }
+}
 
+@Composable
+fun MoviesListAndDetails(
+    movies: List<Movies>,
+    onClick: (Movies) -> Unit,
+    selectedMovie: Movies,
+    contentPadding: PaddingValues,
+    modifier: Modifier = Modifier
+) {
+    Row(modifier = modifier) {
+        MovieList(
+            movies = movies,
+            onClick = onClick,
+            contentPadding = contentPadding,
+            modifier = Modifier
+                .weight(2f)
+                .padding(
+                    top = dimensionResource(R.dimen.padding_medium),
+                    start = dimensionResource(R.dimen.padding_medium),
+                    end = dimensionResource(R.dimen.padding_medium)
+                )
+        )
+        MovieDetails(
+            selectedMovie = selectedMovie,
+            onBackPressed = { },
+            contentPadding = contentPadding,
+            modifier = Modifier.weight(3f)
+        )
+    }
+}
 
+@Composable
+fun MovieDetails(
+    movie: Movies,
+    selectedMovie: Movies,
+    onBackPressed: () -> Unit,
+    contentPadding: PaddingValues,
+    modifier: Modifier = Modifier
+) {
+    // TODO: Add BackHandler
+    BackHandler {
+        onBackPressed()
+    }
 
-    @Preview
-    @Composable
-    fun MovieDetailsPreview() {
-        val movie = Movies(
-            title = "Inception",
-            poster = "https://example.com/poster_inception.jpg",
-            description = "A mind-bending movie about dreams and reality.",
-            releaseDate = "July 16, 2010",
-            contentRating = "PG-13",
-            reviewScore = "4.8",
-            bigImage = "https://example.com/big_image_inception.jpg",
-            length = "148 min"
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(top = 56.dp, start = 16.dp, end = 16.dp, bottom = 16.dp)
+    ) {
+        // Image Composable
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(movie.poster)
+                .crossfade(true)
+                .build(),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(350.dp)
         )
 
-        MovieBuffsAppTheme() {
-            MovieDetails(
-                movie = movie,
-                selectedMovie = movie,
-                onBackPressed = {},
-                contentPadding = PaddingValues()
-            )
-        }
-    }
+        Spacer(modifier = Modifier.height(16.dp))
 
-    @Preview
-    @Composable
-    fun MovieCardPreview() {
-        val movie = Movies(
-            title = "Inception",
-            poster = "https://example.com/poster_inception.jpg",
-            description = "A mind-bending movie about dreams and reality.",
-            releaseDate = "July 16, 2010",
-            contentRating = "PG-13",
-            reviewScore = "4.8",
-            bigImage = "https://example.com/big_image_inception.jpg",
-            length = "148 min"
+        // Details Section
+        Column(modifier = Modifier.padding(8.dp)) {
+            // Row 1
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Info,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.padding(end = 2.dp)
+                )
+                Text(
+                    text = "PG-13 | ${movie.length}",
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // Row 2
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.DateRange,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.padding(end = 2.dp)
+                )
+                Text(
+                    text = "${movie.releaseDate}",
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // Row 3
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Star,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.padding(end = 2.dp)
+                )
+                Text(
+                    text = "${movie.reviewScore}",
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Movie Description Text Composable
+        Text(
+            text = movie.description,
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp)
         )
+    }
+}
 
-        MovieBuffsAppTheme() {
-            MovieCard(movie = movie)
-        }
+@Preview
+@Composable
+fun MovieDetailsPreview() {
+    val movie = Movies(
+        title = "Inception",
+        poster = "https://example.com/poster_inception.jpg",
+        description = "A mind-bending movie about dreams and reality.",
+        releaseDate = "July 16, 2010",
+        contentRating = "PG-13",
+        reviewScore = "4.8",
+        bigImage = "https://example.com/big_image_inception.jpg",
+        length = "148 min"
+    )
+
+    MovieBuffsAppTheme() {
+        MovieDetails(
+            movie = movie,
+            selectedMovie = movie,
+            onBackPressed = {},
+            contentPadding = PaddingValues()
+        )
+    }
+}
+
+@Preview
+@Composable
+fun MovieCardPreview() {
+    val movie = Movies(
+        title = "Inception",
+        poster = "https://example.com/poster_inception.jpg",
+        description = "A mind-bending movie about dreams and reality.",
+        releaseDate = "July 16, 2010",
+        contentRating = "PG-13",
+        reviewScore = "4.8",
+        bigImage = "https://example.com/big_image_inception.jpg",
+        length = "148 min"
+    )
+
+    MovieBuffsAppTheme() {
+        MovieCard(movie = movie)
+    }
+}
+
+@Preview
+@Composable
+fun MovieListPreview() {
+    val movies = List(3) {
+        Movies(
+            title = "Movie Title $it",
+            poster = "https://example.com/poster_$it.jpg",
+            description = "Description for Movie $it",
+            releaseDate = "Release Date $it",
+            contentRating = "PG",
+            reviewScore = "4.$it",
+            bigImage = "https://example.com/big_image_$it.jpg",
+            length = "120 min"
+        )
     }
 
-    @Preview
-    @Composable
-    fun MovieListPreview() {
-        val movies = List(3) {
-            Movies(
-                title = "Movie Title $it",
-                poster = "https://example.com/poster_$it.jpg",
-                description = "Description for Movie $it",
-                releaseDate = "Release Date $it",
-                contentRating = "PG",
-                reviewScore = "4.$it",
-                bigImage = "https://example.com/big_image_$it.jpg",
-                length = "120 min"
-            )
-        }
-
-        MovieBuffsAppTheme() {
-            MovieList(movies = movies)
-        }
+    MovieBuffsAppTheme() {
+        MovieList(movies = movies)
     }
 }
 
