@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -61,7 +62,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -69,6 +69,17 @@ import com.example.moviebuffsapp.R
 import com.example.moviebuffsapp.network.Movies
 import com.example.moviebuffsapp.ui.theme.MovieBuffsAppTheme
 import com.example.moviebuffsapp.ui.utils.MoviesContentType
+
+@Composable
+fun HomeScreen(
+    movieUiState: MovieUiState, modifier: Modifier = Modifier
+) {
+    when (movieUiState) {
+        is MovieUiState.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())
+        is MovieUiState.Success -> MovieList(movieUiState.movies, onClick = {}, modifier = modifier)
+        is MovieUiState.Error -> ErrorScreen(modifier = modifier.fillMaxSize())
+    }
+}
 
 @Composable
 fun MovieBuffsApp(
@@ -101,7 +112,7 @@ fun MovieBuffsApp(
         topBar = {
             MovieBuffsAppBar(
                 isShowingListPage = uiState.isShowingListPage,
-                onBackButtonClick = { ViewModel.navigateToListPage() },
+                onBackButtonClick = { viewModel.navigateToListPage() },
             )
         }
     ) { innerPadding ->
@@ -112,40 +123,30 @@ fun MovieBuffsApp(
                 onClick = {
                     viewModel.updateCurrentMovie(it)
                 },
-                selectedMovie = uiState.currentMovie,
+                selectedMovie = uiState.currentMovie ?: Movies(
+                    title = "",
+                    poster = "",
+                    description = "",
+                    releaseDate = "",
+                    contentRating = "",
+                    reviewScore = "",
+                    bigImage = "",
+                    length = ""
+                ),
                 contentPadding = innerPadding,
                 modifier = Modifier.fillMaxWidth()
             )
 
         } else {
-            if (uiState.isShowingListPage) {
-                MovieList(
-                    movies = uiState.movieList,
-                    onClick = {
-                        viewModel.updateCurrentMovie(it)
-                        viewModel.navigateToDetailPage()
-                    },
-                    contentPadding = innerPadding,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(
-                            top = dimensionResource(R.dimen.padding_medium),
-                            start = dimensionResource(R.dimen.padding_medium),
-                            end = dimensionResource(R.dimen.padding_medium),
-                        )
-                )
-            } else {
-                MovieDetails(
-                    selectedMovie = uiState.currentMovie,
-                    contentPadding = innerPadding,
-                    onBackPressed = {
-                        viewModel.navigateToListPage()
-                    }
-                )
-            }
+            // Here, call HomeScreen and pass the appropriate MovieUiState
+            HomeScreen(
+                movieUiState = uiState.movieUiState,
+                modifier = Modifier.fillMaxSize()
+            )
         }
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

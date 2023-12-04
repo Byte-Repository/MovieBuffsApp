@@ -21,6 +21,7 @@ sealed interface MovieUiState {
 
 data class UiState(
     val currentMovie: Movies?,
+//    val movieList: List<Movies>,
     val isShowingListPage: Boolean = true,
 )
 
@@ -33,6 +34,7 @@ class MovieViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(
         UiState(
             currentMovie = null,
+//            movieList = ,
             isShowingListPage = true
         )
     )
