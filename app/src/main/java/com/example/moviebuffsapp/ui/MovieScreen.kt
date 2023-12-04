@@ -18,6 +18,7 @@ package com.example.moviebuffsapp.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -208,25 +209,34 @@ fun ErrorScreen(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun MovieList(movies: List<Movies>, modifier: Modifier = Modifier) {
+fun MovieList(
+    movies: List<Movies>,
+    onClick: (Movies) -> Unit,
+    modifier: Modifier = Modifier
+) {
     LazyColumn(
         modifier = modifier
             .padding(4.dp)
             .fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(2.dp), // Added verticalArrangement
+        verticalArrangement = Arrangement.spacedBy(2.dp),
     ) {
         items(items = movies, key = { movie -> movie.title }) { movie ->
             MovieCard(
                 movie = movie,
+                onClick = onClick
             )
         }
     }
 }
 
 @Composable
-fun MovieCard(movie: Movies, modifier: Modifier = Modifier) {
+fun MovieCard(
+    movie: Movies,
+    onClick: (Movies) -> Unit,
+    modifier: Modifier = Modifier) {
     Card(
         modifier = modifier
+            .clickable { onClick(movie) }
             .padding(top = 8.dp)
             .height(180.dp)
             .fillMaxWidth()
