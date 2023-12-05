@@ -14,11 +14,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.moviebuffsapp.ui.MovieBuffsApp
 import com.example.moviebuffsapp.ui.theme.MovieBuffsAppTheme
+import com.example.moviebuffsapp.ui.MovieViewModel
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val movieViewModel = MovieViewModel()
+
         setContent {
             MovieBuffsAppTheme {
                 // A surface container using the 'background' color from the theme
@@ -28,6 +32,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val windowSize = calculateWindowSizeClass(this)
                     MovieBuffsApp(
+                        viewModel = movieViewModel,
                         windowSize = windowSize.widthSizeClass
                     )
                 }
@@ -40,8 +45,10 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MovieBuffsAppCompactPreview() {
     MovieBuffsAppTheme {
+        val viewModel = MovieViewModel() // Create an instance of MovieViewModel
         Surface {
             MovieBuffsApp(
+                viewModel = viewModel, // Pass the viewModel instance
                 windowSize = WindowWidthSizeClass.Compact
             )
         }
@@ -52,8 +59,10 @@ fun MovieBuffsAppCompactPreview() {
 @Composable
 fun MovieBuffsAppMediumPreview() {
     MovieBuffsAppTheme {
+        val viewModel = MovieViewModel() // Create an instance of MovieViewModel
         Surface {
             MovieBuffsApp(
+                viewModel = viewModel, // Pass the viewModel instance
                 windowSize = WindowWidthSizeClass.Medium
             )
         }
@@ -64,8 +73,10 @@ fun MovieBuffsAppMediumPreview() {
 @Composable
 fun MovieBuffsAppExpandedPreview() {
     MovieBuffsAppTheme {
+        val viewModel = MovieViewModel() // Create an instance of MovieViewModel
         Surface {
             MovieBuffsApp(
+                viewModel = viewModel, // Pass the viewModel instance
                 windowSize = WindowWidthSizeClass.Expanded
             )
         }

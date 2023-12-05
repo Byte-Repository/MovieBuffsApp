@@ -68,45 +68,72 @@ import coil.request.ImageRequest
 import com.example.moviebuffsapp.R
 import com.example.moviebuffsapp.network.Movies
 import com.example.moviebuffsapp.ui.theme.MovieBuffsAppTheme
-import com.example.moviebuffsapp.ui.utils.MoviesContentType
 
 @Composable
 fun HomeScreen(
-    movieUiState: MovieUiState, modifier: Modifier = Modifier
+    viewModel: MovieViewModel,
+    movieUiState: MovieUiState,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues
 ) {
     when (movieUiState) {
         is MovieUiState.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())
-        is MovieUiState.Success -> MovieList(movieUiState.movies, onClick = {}, modifier = modifier)
+        is MovieUiState.Success -> {
+            if (movieUiState.isShowingListPage) {
+                MovieList(
+                    movies = movieUiState.movies,
+                    onClick = {
+                        viewModel.updateCurrentMovie(it)
+                        viewModel.navigateToDetailPage()
+                    },
+                    contentPadding = contentPadding
+                )
+            } else {
+                MovieDetails(
+                    movie = movieUiState.currentMovie ?: movieUiState.movies[0],
+                    onBackPressed = { viewModel.navigateToListPage() },
+                    contentPadding = contentPadding
+                )
+            }
+        }
         is MovieUiState.Error -> ErrorScreen(modifier = modifier.fillMaxSize())
     }
 }
 
 @Composable
+fun LoadingScreen(modifier: Modifier = Modifier) {
+    Image(
+        modifier = modifier.size(200.dp),
+        painter = painterResource(R.drawable.loading_img),
+        contentDescription = stringResource(R.string.loading)
+    )
+}
+
+@Composable
+fun ErrorScreen(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.ic_connection_error),
+            contentDescription = ""
+        )
+        Text(text = stringResource(R.string.loading_failed), modifier = Modifier.padding(16.dp))
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+@Composable
 fun MovieBuffsApp(
+    viewModel: MovieViewModel,
     windowSize: WindowWidthSizeClass,
     modifier: Modifier = Modifier
 ) {
     val viewModel: MovieViewModel = viewModel()
     val uiState by viewModel.uiState.collectAsState()
-
-    val contentType: MoviesContentType
-    when (windowSize) {
-        WindowWidthSizeClass.Compact -> {
-            contentType = MoviesContentType.LIST_ONLY
-        }
-
-        WindowWidthSizeClass.Medium -> {
-            contentType = MoviesContentType.LIST_ONLY
-        }
-
-        WindowWidthSizeClass.Expanded -> {
-            contentType = MoviesContentType.LIST_AND_DETAIL
-        }
-
-        else -> {
-            contentType = MoviesContentType.LIST_ONLY
-        }
-    }
 
     Scaffold(
         topBar = {
@@ -116,34 +143,12 @@ fun MovieBuffsApp(
             )
         }
     ) { innerPadding ->
-        // TODO: Add simple navigation with if/else conditional to show Details page
-        if (contentType == MoviesContentType.LIST_AND_DETAIL) {
-            MoviesListAndDetails(
-                movies = uiState.movieList,
-                onClick = {
-                    viewModel.updateCurrentMovie(it)
-                },
-                selectedMovie = uiState.currentMovie ?: Movies(
-                    title = "",
-                    poster = "",
-                    description = "",
-                    releaseDate = "",
-                    contentRating = "",
-                    reviewScore = "",
-                    bigImage = "",
-                    length = ""
-                ),
-                contentPadding = innerPadding,
-                modifier = Modifier.fillMaxWidth()
-            )
-
-        } else {
-            // Here, call HomeScreen and pass the appropriate MovieUiState
-            HomeScreen(
-                movieUiState = uiState.movieUiState,
-                modifier = Modifier.fillMaxSize()
-            )
-        }
+        HomeScreen(
+            viewModel = viewModel,
+            movieUiState = uiState,
+            modifier = modifier,
+            contentPadding = innerPadding
+        )
     }
 }
 
@@ -184,29 +189,7 @@ fun MovieBuffsAppBar(
     )
 }
 
-@Composable
-fun LoadingScreen(modifier: Modifier = Modifier) {
-    Image(
-        modifier = modifier.size(200.dp),
-        painter = painterResource(R.drawable.loading_img),
-        contentDescription = stringResource(R.string.loading)
-    )
-}
-
-@Composable
-fun ErrorScreen(modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.ic_connection_error),
-            contentDescription = ""
-        )
-        Text(text = stringResource(R.string.loading_failed), modifier = Modifier.padding(16.dp))
-    }
-}
+//////////////////////////////////////////////////////////////////////////////////////////////////
 
 @Composable
 fun MovieList(
@@ -305,45 +288,13 @@ fun MovieCard(
     }
 }
 
-//@Composable
-//fun MoviesListAndDetails(
-//    movies: List<Movies>,
-//    onClick: (Movies) -> Unit,
-//    selectedMovie: Movies,
-//    contentPadding: PaddingValues,
-//    modifier: Modifier = Modifier
-//) {
-//    Row(modifier = modifier) {
-//        MovieList(
-//            movies = movies,
-//            onClick = onClick,
-//            contentPadding = contentPadding,
-//            modifier = Modifier
-//                .weight(2f)
-//                .padding(
-//                    top = dimensionResource(R.dimen.padding_medium),
-//                    start = dimensionResource(R.dimen.padding_medium),
-//                    end = dimensionResource(R.dimen.padding_medium)
-//                )
-//        )
-//        MovieDetails(
-//            selectedMovie = selectedMovie,
-//            onBackPressed = { },
-//            contentPadding = contentPadding,
-//            modifier = Modifier.weight(3f)
-//        )
-//    }
-//}
-
 @Composable
 fun MovieDetails(
     movie: Movies,
-    selectedMovie: Movies,
     onBackPressed: () -> Unit,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
-    // TODO: Add BackHandler
     BackHandler {
         onBackPressed()
     }
@@ -439,6 +390,38 @@ fun MovieDetails(
     }
 }
 
+@Composable
+fun MovieListAndDetails(
+    movies: List<Movies>,
+    onClick: (Movies) -> Unit,
+    selectedMovie: Movies,
+    contentPadding: PaddingValues,
+    modifier: Modifier = Modifier
+) {
+    Row(modifier = modifier) {
+        MovieList(
+            movies = movies,
+            onClick = onClick, // Pass the onClick lambda to MovieList
+            contentPadding = contentPadding,
+            modifier = Modifier
+                .weight(2f)
+                .padding(
+                    top = dimensionResource(R.dimen.padding_medium),
+                    start = dimensionResource(R.dimen.padding_medium),
+                    end = dimensionResource(R.dimen.padding_medium)
+                )
+        )
+        MovieDetails(
+            movie = selectedMovie,
+            onBackPressed = { },
+            contentPadding = contentPadding,
+            modifier = Modifier.weight(3f)
+        )
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
 @Preview
 @Composable
 fun MovieDetailsPreview() {
@@ -456,7 +439,6 @@ fun MovieDetailsPreview() {
     MovieBuffsAppTheme() {
         MovieDetails(
             movie = movie,
-            selectedMovie = movie,
             onBackPressed = {},
             contentPadding = PaddingValues()
         )
