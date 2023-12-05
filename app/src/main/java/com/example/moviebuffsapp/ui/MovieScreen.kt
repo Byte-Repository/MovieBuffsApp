@@ -53,6 +53,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
@@ -62,6 +63,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -76,10 +78,12 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+
     when (movieUiState) {
         is MovieUiState.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())
         is MovieUiState.Success -> {
-            if (movieUiState.isShowingListPage) {
+            if (uiState.isShowingListPage) {
                 MovieList(
                     movies = movieUiState.movies,
                     onClick = {
@@ -90,7 +94,7 @@ fun HomeScreen(
                 )
             } else {
                 MovieDetails(
-                    movie = movieUiState.currentMovie ?: movieUiState.movies[0],
+                    movie = uiState.currentMovie ?: movieUiState.movies[0],
                     onBackPressed = { viewModel.navigateToListPage() },
                     contentPadding = contentPadding
                 )
@@ -145,7 +149,7 @@ fun MovieBuffsApp(
     ) { innerPadding ->
         HomeScreen(
             viewModel = viewModel,
-            movieUiState = uiState,
+            movieUiState = viewModel.movieUiState,
             modifier = modifier,
             contentPadding = innerPadding
         )
@@ -164,9 +168,9 @@ fun MovieBuffsAppBar(
             Text(
                 text =
                 if (!isShowingListPage) {
-                    stringResource(R.string.detail_fragment_label)
+                    stringResource(R.string.movie_buffs_app)
                 } else {
-                    stringResource(R.string.list_fragment_label)
+                    stringResource(R.string.movie_buffs_app)
                 }
             )
         },
@@ -183,7 +187,7 @@ fun MovieBuffsAppBar(
             { Box {} }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primary
+            containerColor = Color.White
         ),
         modifier = modifier,
     )
@@ -302,12 +306,12 @@ fun MovieDetails(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(top = 56.dp, start = 16.dp, end = 16.dp, bottom = 16.dp)
+            .padding()
     ) {
         // Image Composable
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(movie.poster)
+                .data(movie.bigImage)
                 .crossfade(true)
                 .build(),
             contentDescription = null,
@@ -319,9 +323,17 @@ fun MovieDetails(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Details Section
         Column(modifier = Modifier.padding(8.dp)) {
-            // Row 1
+            Text(
+                text = movie.title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                fontSize = 32.sp,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
@@ -352,7 +364,7 @@ fun MovieDetails(
                     modifier = Modifier.padding(end = 2.dp)
                 )
                 Text(
-                    text = "${movie.releaseDate}",
+                    text = movie.releaseDate,
                     style = MaterialTheme.typography.titleMedium
                 )
             }
@@ -371,7 +383,7 @@ fun MovieDetails(
                     modifier = Modifier.padding(end = 2.dp)
                 )
                 Text(
-                    text = "${movie.reviewScore}",
+                    text = movie.reviewScore,
                     style = MaterialTheme.typography.titleMedium
                 )
             }
@@ -379,7 +391,7 @@ fun MovieDetails(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Movie Description Text Composable
+        // Movie Description
         Text(
             text = movie.description,
             style = MaterialTheme.typography.titleMedium,
@@ -436,7 +448,7 @@ fun MovieDetailsPreview() {
         length = "148 min"
     )
 
-    MovieBuffsAppTheme() {
+    MovieBuffsAppTheme {
         MovieDetails(
             movie = movie,
             onBackPressed = {},
@@ -459,7 +471,7 @@ fun MovieCardPreview() {
         length = "148 min"
     )
 
-    MovieBuffsAppTheme() {
+    MovieBuffsAppTheme {
         MovieCard(movie = movie, onClick = {}) // Provide a placeholder onClick lambda
     }
 }
@@ -480,7 +492,7 @@ fun MovieListPreview() {
         )
     }
 
-    MovieBuffsAppTheme() {
+    MovieBuffsAppTheme {
         MovieList(movies = movies, onClick = {}) // Provide a placeholder onClick lambda
     }
 }
