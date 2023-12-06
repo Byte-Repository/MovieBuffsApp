@@ -44,6 +44,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -75,23 +76,38 @@ import com.example.moviebuffsapp.ui.theme.MovieBuffsAppTheme
 fun HomeScreen(
     viewModel: MovieViewModel,
     movieUiState: MovieUiState,
+    windowSize: WindowWidthSizeClass,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    when (movieUiState) {
-        is MovieUiState.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())
-        is MovieUiState.Success -> {
+    when {
+        movieUiState is MovieUiState.Loading -> {
+            LoadingScreen(modifier = modifier.fillMaxSize())
+        }
+        movieUiState is MovieUiState.Success -> {
             if (uiState.isShowingListPage) {
-                MovieList(
-                    movies = movieUiState.movies,
-                    onClick = {
-                        viewModel.updateCurrentMovie(it)
-                        viewModel.navigateToDetailPage()
-                    },
-                    contentPadding = contentPadding
-                )
+                if (windowSize == WindowWidthSizeClass.Expanded) {
+                    MovieListAndDetails(
+                        movies = uiState.movies,
+                        onClick = {
+                            viewModel.updateCurrentMovie(it)
+                        },
+                        selectedMovie = uiState.currentMovie ?: movieUiState.movies[0],
+                        contentPadding = contentPadding,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                } else {
+                    MovieList(
+                        movies = movieUiState.movies,
+                        onClick = {
+                            viewModel.updateCurrentMovie(it)
+                            viewModel.navigateToDetailPage()
+                        },
+                        contentPadding = contentPadding
+                    )
+                }
             } else {
                 MovieDetails(
                     movie = uiState.currentMovie ?: movieUiState.movies[0],
@@ -100,7 +116,9 @@ fun HomeScreen(
                 )
             }
         }
-        is MovieUiState.Error -> ErrorScreen(modifier = modifier.fillMaxSize())
+        movieUiState is MovieUiState.Error -> {
+            ErrorScreen(modifier = modifier.fillMaxSize())
+        }
     }
 }
 
@@ -132,7 +150,6 @@ fun ErrorScreen(modifier: Modifier = Modifier) {
 
 @Composable
 fun MovieBuffsApp(
-    viewModel: MovieViewModel,
     windowSize: WindowWidthSizeClass,
     modifier: Modifier = Modifier
 ) {
@@ -150,6 +167,7 @@ fun MovieBuffsApp(
         HomeScreen(
             viewModel = viewModel,
             movieUiState = viewModel.movieUiState,
+            windowSize = windowSize,
             modifier = modifier,
             contentPadding = innerPadding
         )
@@ -168,9 +186,9 @@ fun MovieBuffsAppBar(
             Text(
                 text =
                 if (!isShowingListPage) {
-                    stringResource(R.string.movie_buffs_app)
+                    stringResource(R.string.app_name)
                 } else {
-                    stringResource(R.string.movie_buffs_app)
+                    stringResource(R.string.app_name)
                 }
             )
         },
@@ -242,7 +260,7 @@ fun MovieCard(
                     .build(),
                 error = painterResource(R.drawable.ic_broken_image),
                 placeholder = painterResource(R.drawable.loading_img),
-                contentDescription = stringResource(R.string.movie_buffs_app),
+                contentDescription = stringResource(R.string.app_name),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .padding(end = 4.dp)
@@ -308,7 +326,7 @@ fun MovieDetails(
             .fillMaxWidth()
             .padding()
     ) {
-        // Image Composable
+
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
                 .data(movie.bigImage)
@@ -352,7 +370,6 @@ fun MovieDetails(
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            // Row 2
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
@@ -371,7 +388,6 @@ fun MovieDetails(
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            // Row 3
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
@@ -391,7 +407,6 @@ fun MovieDetails(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Movie Description
         Text(
             text = movie.description,
             style = MaterialTheme.typography.titleMedium,
@@ -436,6 +451,46 @@ fun MovieListAndDetails(
 
 @Preview
 @Composable
+fun MovieCardPreview() {
+    val movie = Movies(
+        title = "Inception",
+        poster = "https://example.com/poster_inception.jpg",
+        description = "A mind-bending movie about dreams and reality.",
+        releaseDate = "July 16, 2010",
+        contentRating = "PG-13",
+        reviewScore = "4.8",
+        bigImage = "https://example.com/big_image_inception.jpg",
+        length = "148 min"
+    )
+
+    MovieBuffsAppTheme {
+        MovieCard(movie = movie, onClick = {})
+    }
+}
+
+@Preview
+@Composable
+fun MovieListPreview() {
+    val movies = List(3) {
+        Movies(
+            title = "Movie Title $it",
+            poster = "https://example.com/poster_$it.jpg",
+            description = "Description for Movie $it",
+            releaseDate = "Release Date $it",
+            contentRating = "PG",
+            reviewScore = "4.$it",
+            bigImage = "https://example.com/big_image_$it.jpg",
+            length = "120 min"
+        )
+    }
+
+    MovieBuffsAppTheme {
+        MovieList(movies = movies, onClick = {})
+    }
+}
+
+@Preview
+@Composable
 fun MovieDetailsPreview() {
     val movie = Movies(
         title = "Inception",
@@ -457,44 +512,45 @@ fun MovieDetailsPreview() {
     }
 }
 
-@Preview
+@Preview(showBackground = true, widthDp = 1000)
 @Composable
-fun MovieCardPreview() {
-    val movie = Movies(
-        title = "Inception",
-        poster = "https://example.com/poster_inception.jpg",
-        description = "A mind-bending movie about dreams and reality.",
-        releaseDate = "July 16, 2010",
-        contentRating = "PG-13",
-        reviewScore = "4.8",
-        bigImage = "https://example.com/big_image_inception.jpg",
-        length = "148 min"
-    )
-
-    MovieBuffsAppTheme {
-        MovieCard(movie = movie, onClick = {}) // Provide a placeholder onClick lambda
-    }
-}
-
-@Preview
-@Composable
-fun MovieListPreview() {
-    val movies = List(3) {
+fun MovieListAndDetailsPreview() {
+    val movies = List(3) { index ->
         Movies(
-            title = "Movie Title $it",
-            poster = "https://example.com/poster_$it.jpg",
-            description = "Description for Movie $it",
-            releaseDate = "Release Date $it",
+            title = "Movie Title $index",
+            poster = "https://example.com/poster_$index.jpg",
+            description = "Description for Movie $index",
+            releaseDate = "Release Date $index",
             contentRating = "PG",
-            reviewScore = "4.$it",
-            bigImage = "https://example.com/big_image_$it.jpg",
+            reviewScore = "4.$index",
+            bigImage = "https://example.com/big_image_$index.jpg",
             length = "120 min"
         )
     }
 
+    val selectedMovie = Movies(
+        title = "Selected Movie",
+        poster = "https://example.com/selected_movie_poster.jpg",
+        description = "Description for Selected Movie",
+        releaseDate = "Selected Release Date",
+        contentRating = "PG-13",
+        reviewScore = "4.5",
+        bigImage = "https://example.com/selected_movie_big_image.jpg",
+        length = "150 min"
+    )
+
     MovieBuffsAppTheme {
-        MovieList(movies = movies, onClick = {}) // Provide a placeholder onClick lambda
+        MovieListAndDetails(
+            movies = movies,
+            onClick = { },
+            selectedMovie = selectedMovie,
+            contentPadding = PaddingValues(),
+            modifier = Modifier.fillMaxWidth(0.5f)
+        )
     }
 }
+
+
+
 
 
