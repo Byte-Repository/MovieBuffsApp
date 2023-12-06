@@ -34,7 +34,9 @@ class MovieViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(
         UiState(
             currentMovie = null,
-            movies = emptyList(),
+            movies = listOf(
+                Movies("Title1", "Poster1", "Description1", "releaseDate", "contentRating", "reviewScore", "bigImage", "length")
+            ),
             isShowingListPage = true
         )
     )
