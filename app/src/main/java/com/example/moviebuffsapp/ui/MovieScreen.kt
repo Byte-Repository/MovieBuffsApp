@@ -90,19 +90,7 @@ fun HomeScreen(
         movieUiState is MovieUiState.Success -> {
             if (uiState.isShowingListPage) {
                 when (contentType) {
-                    MoviesContentType.LIST_ONLY -> {
-                        // Render the MovieList content
-                        MovieList(
-                            movies = movieUiState.movies,
-                            onClick = {
-                                viewModel.updateCurrentMovie(it)
-                                viewModel.navigateToDetailPage()
-                            },
-                            contentPadding = contentPadding
-                        )
-                    }
                     MoviesContentType.LIST_AND_DETAIL -> {
-                        // Render the MovieListAndDetails content
                         MovieListAndDetails(
                             movies = uiState.movies,
                             onClick = {
@@ -112,6 +100,16 @@ fun HomeScreen(
                             contentPadding = contentPadding,
                             modifier = Modifier.fillMaxWidth()
                         )
+                        MovieList(
+                            movies = movieUiState.movies,
+                            onClick = {
+                                viewModel.updateCurrentMovie(it)
+                                viewModel.navigateToDetailPage()
+                            },
+                            contentPadding = contentPadding
+                        )
+                    }
+                    else -> {
                     }
                 }
             } else {
@@ -235,29 +233,6 @@ fun MovieBuffsAppBar(
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 @Composable
-fun MovieList(
-    movies: List<Movies>,
-    onClick: (Movies) -> Unit,
-    modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(0.dp),
-) {
-    LazyColumn(
-        contentPadding = contentPadding,
-        modifier = modifier
-            .padding(4.dp)
-            .fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(2.dp),
-    ) {
-        items(items = movies, key = { movie -> movie.title }) { movie ->
-            MovieCard(
-                movie = movie,
-                onClick = onClick
-            )
-        }
-    }
-}
-
-@Composable
 fun MovieCard(
     movie: Movies,
     onClick: (Movies) -> Unit,
@@ -327,6 +302,29 @@ fun MovieCard(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun MovieList(
+    movies: List<Movies>,
+    onClick: (Movies) -> Unit,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+) {
+    LazyColumn(
+        contentPadding = contentPadding,
+        modifier = modifier
+            .padding(4.dp)
+            .fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+        items(items = movies, key = { movie -> movie.title }) { movie ->
+            MovieCard(
+                movie = movie,
+                onClick = onClick
+            )
         }
     }
 }
