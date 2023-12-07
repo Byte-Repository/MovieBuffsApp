@@ -454,9 +454,8 @@ fun MovieListAndDetails(
             modifier = Modifier
                 .weight(2f)
                 .padding(
-                    top = dimensionResource(R.dimen.padding_medium),
-                    start = dimensionResource(R.dimen.padding_medium),
-                    end = dimensionResource(R.dimen.padding_medium)
+                    start = 16.dp,
+                    end = 16.dp
                 )
         )
         MovieDetails(
