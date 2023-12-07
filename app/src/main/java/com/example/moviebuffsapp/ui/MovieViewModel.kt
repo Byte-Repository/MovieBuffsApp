@@ -34,9 +34,7 @@ class MovieViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(
         UiState(
             currentMovie = null,
-            movies = listOf(
-                Movies("Title1", "Poster1", "Description1", "releaseDate", "contentRating", "reviewScore", "bigImage", "length")
-            ),
+            movies = emptyList(),
             isShowingListPage = true
         )
     )
@@ -67,7 +65,6 @@ class MovieViewModel : ViewModel() {
             it.copy(isShowingListPage = false)
         }
     }
-
 
     /**
      * Gets Movies information from the Movie API Retrofit service and updates

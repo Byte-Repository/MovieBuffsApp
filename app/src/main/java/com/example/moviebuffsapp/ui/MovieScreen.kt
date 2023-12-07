@@ -44,7 +44,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -71,12 +70,14 @@ import coil.request.ImageRequest
 import com.example.moviebuffsapp.R
 import com.example.moviebuffsapp.network.Movies
 import com.example.moviebuffsapp.ui.theme.MovieBuffsAppTheme
+import com.example.moviebuffsapp.ui.utils.MoviesContentType
 
 @Composable
 fun HomeScreen(
     viewModel: MovieViewModel,
     movieUiState: MovieUiState,
     windowSize: WindowWidthSizeClass,
+    contentType: MoviesContentType,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues
 ) {
@@ -88,25 +89,30 @@ fun HomeScreen(
         }
         movieUiState is MovieUiState.Success -> {
             if (uiState.isShowingListPage) {
-                if (windowSize == WindowWidthSizeClass.Expanded) {
-                    MovieListAndDetails(
-                        movies = uiState.movies,
-                        onClick = {
-                            viewModel.updateCurrentMovie(it)
-                        },
-                        selectedMovie = uiState.currentMovie ?: movieUiState.movies[0],
-                        contentPadding = contentPadding,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                } else {
-                    MovieList(
-                        movies = movieUiState.movies,
-                        onClick = {
-                            viewModel.updateCurrentMovie(it)
-                            viewModel.navigateToDetailPage()
-                        },
-                        contentPadding = contentPadding
-                    )
+                when (contentType) {
+                    MoviesContentType.LIST_ONLY -> {
+                        // Render the MovieList content
+                        MovieList(
+                            movies = movieUiState.movies,
+                            onClick = {
+                                viewModel.updateCurrentMovie(it)
+                                viewModel.navigateToDetailPage()
+                            },
+                            contentPadding = contentPadding
+                        )
+                    }
+                    MoviesContentType.LIST_AND_DETAIL -> {
+                        // Render the MovieListAndDetails content
+                        MovieListAndDetails(
+                            movies = uiState.movies,
+                            onClick = {
+                                viewModel.updateCurrentMovie(it)
+                            },
+                            selectedMovie = uiState.currentMovie ?: movieUiState.movies[0],
+                            contentPadding = contentPadding,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 }
             } else {
                 MovieDetails(
@@ -156,6 +162,20 @@ fun MovieBuffsApp(
     val viewModel: MovieViewModel = viewModel()
     val uiState by viewModel.uiState.collectAsState()
 
+    val contentType: MoviesContentType
+    when (windowSize) {
+        WindowWidthSizeClass.Compact, WindowWidthSizeClass.Medium -> {
+            contentType = MoviesContentType.LIST_ONLY
+        }
+
+        WindowWidthSizeClass.Expanded -> {
+            contentType = MoviesContentType.LIST_AND_DETAIL
+        }
+
+        else -> {
+            contentType = MoviesContentType.LIST_ONLY
+        }
+    }
     Scaffold(
         topBar = {
             MovieBuffsAppBar(
@@ -168,6 +188,7 @@ fun MovieBuffsApp(
             viewModel = viewModel,
             movieUiState = viewModel.movieUiState,
             windowSize = windowSize,
+            contentType = contentType,
             modifier = modifier,
             contentPadding = innerPadding
         )
@@ -515,7 +536,7 @@ fun MovieDetailsPreview() {
 @Preview(showBackground = true, widthDp = 1000)
 @Composable
 fun MovieListAndDetailsPreview() {
-    val movies = List(3) { index ->
+    val movies = List(7) { index ->
         Movies(
             title = "Movie Title $index",
             poster = "https://example.com/poster_$index.jpg",
@@ -549,7 +570,6 @@ fun MovieListAndDetailsPreview() {
         )
     }
 }
-
 
 
 

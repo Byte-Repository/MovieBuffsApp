@@ -14,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.moviebuffsapp.ui.MovieBuffsApp
 import com.example.moviebuffsapp.ui.theme.MovieBuffsAppTheme
-import com.example.moviebuffsapp.ui.MovieViewModel
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
