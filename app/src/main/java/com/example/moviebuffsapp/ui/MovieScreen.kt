@@ -107,6 +107,11 @@ fun HomeScreen(
                                 viewModel.navigateToDetailPage()
                             },
                             contentPadding = contentPadding,
+                            modifier = Modifier
+                                .padding(
+                                    start = 16.dp,
+                                    end = 16.dp
+                                )
                         )
                     }
                     else -> {
