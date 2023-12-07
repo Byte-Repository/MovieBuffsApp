@@ -106,7 +106,7 @@ fun HomeScreen(
                                 viewModel.updateCurrentMovie(it)
                                 viewModel.navigateToDetailPage()
                             },
-                            contentPadding = contentPadding
+                            contentPadding = contentPadding,
                         )
                     }
                     else -> {
@@ -318,7 +318,6 @@ fun MovieList(
         modifier = modifier
             .padding(4.dp)
             .fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(2.dp),
     ) {
         items(items = movies, key = { movie -> movie.title }) { movie ->
             MovieCard(
