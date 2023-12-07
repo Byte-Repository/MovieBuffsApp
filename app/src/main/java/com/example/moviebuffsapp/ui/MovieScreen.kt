@@ -449,7 +449,7 @@ fun MovieListAndDetails(
     Row(modifier = modifier) {
         MovieList(
             movies = movies,
-            onClick = onClick, // Pass the onClick lambda to MovieList
+            onClick = onClick,
             contentPadding = contentPadding,
             modifier = Modifier
                 .weight(2f)
@@ -474,14 +474,14 @@ fun MovieListAndDetails(
 @Composable
 fun MovieCardPreview() {
     val movie = Movies(
-        title = "Inception",
-        poster = "https://example.com/poster_inception.jpg",
-        description = "A mind-bending movie about dreams and reality.",
-        releaseDate = "July 16, 2010",
+        title = "Iron Man",
+        poster = "https://example.com/poster.jpg",
+        description = "Iron Man is the best.",
+        releaseDate = "July 30, 2001",
         contentRating = "PG-13",
-        reviewScore = "4.8",
-        bigImage = "https://example.com/big_image_inception.jpg",
-        length = "148 min"
+        reviewScore = "9.0",
+        bigImage = "https://example.com/big_image.jpg",
+        length = "150 min"
     )
 
     MovieBuffsAppTheme {
@@ -494,14 +494,14 @@ fun MovieCardPreview() {
 fun MovieListPreview() {
     val movies = List(3) {
         Movies(
-            title = "Movie Title $it",
+            title = "Movie $it",
             poster = "https://example.com/poster_$it.jpg",
-            description = "Description for Movie $it",
+            description = "Description $it",
             releaseDate = "Release Date $it",
-            contentRating = "PG",
-            reviewScore = "4.$it",
+            contentRating = "PG-13",
+            reviewScore = "7.$it",
             bigImage = "https://example.com/big_image_$it.jpg",
-            length = "120 min"
+            length = "170 min"
         )
     }
 
@@ -514,14 +514,14 @@ fun MovieListPreview() {
 @Composable
 fun MovieDetailsPreview() {
     val movie = Movies(
-        title = "Inception",
-        poster = "https://example.com/poster_inception.jpg",
-        description = "A mind-bending movie about dreams and reality.",
-        releaseDate = "July 16, 2010",
+        title = "Iron Man",
+        poster = "https://example.com/poster.jpg",
+        description = "Iron Man is the best.",
+        releaseDate = "July 30, 2001",
         contentRating = "PG-13",
-        reviewScore = "4.8",
-        bigImage = "https://example.com/big_image_inception.jpg",
-        length = "148 min"
+        reviewScore = "9.0",
+        bigImage = "https://example.com/big_image.jpg",
+        length = "150 min"
     )
 
     MovieBuffsAppTheme {
@@ -538,9 +538,9 @@ fun MovieDetailsPreview() {
 fun MovieListAndDetailsPreview() {
     val movies = List(7) { index ->
         Movies(
-            title = "Movie Title $index",
+            title = "Movie $index",
             poster = "https://example.com/poster_$index.jpg",
-            description = "Description for Movie $index",
+            description = "Description $index",
             releaseDate = "Release Date $index",
             contentRating = "PG",
             reviewScore = "4.$index",
